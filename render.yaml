@@ -19,9 +19,13 @@ services:
         value: production
       - key: NIVEAU_JOURNAL
         value: info
-      # Render place un reverse proxy devant le service : il fournit l'IP réelle du client.
+      # Render place deux proxys devant le service (passerelle publique puis répartiteur interne
+      # en 10.x.x.x). Avec 1, le journal d'audit enregistrait l'IP interne de Render et la limite
+      # de tentatives de connexion était partagée par tous les utilisateurs. Valeur constatée en
+      # production : elle ne doit jamais dépasser le nombre réel de proxys, sinon un client
+      # pourrait usurper son adresse via X-Forwarded-For.
       - key: NOMBRE_PROXYS_DE_CONFIANCE
-        value: '1'
+        value: '2'
       - key: DATABASE_URL
         sync: false
       - key: CHEMIN_CERTIFICAT_CA_BASE
