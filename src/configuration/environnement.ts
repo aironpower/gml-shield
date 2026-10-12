@@ -11,6 +11,7 @@ const schemaEnvironnement = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65_535).default(3000),
   NIVEAU_JOURNAL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'silent']).default('info'),
+  NOMBRE_PROXYS_DE_CONFIANCE: z.coerce.number().int().min(0).max(5).default(0),
 });
 
 export type Environnement = z.infer<typeof schemaEnvironnement>;

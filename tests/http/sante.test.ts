@@ -44,4 +44,14 @@ describe('Socle HTTP', () => {
     expect(reponse.status).toBe(400);
     expect(reponse.body).toEqual({ erreur: 'Requête mal formée' });
   });
+
+  it('n’accorde aucune confiance aux en-têtes X-Forwarded-For par défaut', () => {
+    expect(application.get('trust proxy')).toBe(0);
+  });
+
+  it('ne fait confiance qu’au nombre de proxys configuré, jamais à toute la chaîne', () => {
+    const applicationDerriereProxy = creerApplication({ nombreProxysDeConfiance: 1 });
+
+    expect(applicationDerriereProxy.get('trust proxy')).toBe(1);
+  });
 });
