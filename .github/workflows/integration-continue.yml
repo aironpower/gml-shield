@@ -1,0 +1,44 @@
+# Barrière qualité obligatoire avant toute fusion dans main (cf. guide qualité de code).
+name: Intégration continue
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    name: Format, lint, typage, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances (versions verrouillées)
+        run: npm ci
+
+      - name: Vérifier les vulnérabilités connues des dépendances
+        run: npm audit --audit-level=high --omit=dev
+
+      - name: Vérifier le formatage
+        run: npm run format:verifier
+
+      - name: Analyse statique
+        run: npm run lint
+
+      - name: Vérifier le typage
+        run: npm run typage
+
+      - name: Tests et seuils de couverture
+        run: npm run test:couverture
+
+      - name: Compiler
+        run: npm run build
