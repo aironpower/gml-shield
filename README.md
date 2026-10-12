@@ -8,13 +8,25 @@ Prérequis : Node.js 22 ou plus, Docker.
 
 ```bash
 npm ci
-cp .env.example .env
+cp .env.example .env   # puis renseigner SECRET_JWT et MOT_DE_PASSE_COMPTES_DEMO
 docker compose up -d   # PostgreSQL local (bases gml_shield et gml_shield_test)
 npm run migrer         # crée ou met à jour le schéma
+npm run comptes:demo   # crée un admin, un répartiteur et deux chauffeurs de démonstration
 npm run dev            # serveur sur http://localhost:3000/api/sante
 ```
 
 Les tests (`npm test`) mettent automatiquement à jour le schéma de la base `gml_shield_test` ; chaque test s'exécute dans une transaction annulée.
+
+## API
+
+| Méthode et route        | Accès   | Rôle                                                       |
+| ----------------------- | ------- | ---------------------------------------------------------- |
+| `GET /api/sante`        | public  | Disponibilité du service                                   |
+| `POST /api/auth/login`  | public  | Ouvre une session : jeton JWT de 15 min en cookie HttpOnly |
+| `GET /api/auth/me`      | session | Utilisateur de la session courante                         |
+| `POST /api/auth/logout` | session | Révoque le jeton immédiatement                             |
+
+Toute requête `POST`, `PUT`, `PATCH` ou `DELETE` doit porter l'en-tête `Origin` du client autorisé (`ORIGINE_AUTORISEE`) et est inscrite au journal d'audit.
 
 ## Commandes qualité
 
@@ -32,9 +44,13 @@ Les tests (`npm test`) mettent automatiquement à jour le schéma de la base `gm
 src/
 ├── serveur.ts                 Point d'entrée : ouvre le port réseau
 ├── configuration/             Variables d'environnement validées au démarrage
-├── http/                      Couche HTTP : application, routes, intercepteurs
-├── infrastructure/            Services techniques : journalisation, base de données
-└── migrer.ts                  Point d'entrée : applique les migrations
+├── domaine/                   Types et erreurs métier, sans dépendance technique
+├── services/                  Règles métier (authentification…)
+├── depots/                    Accès aux données : SQL paramétré uniquement
+├── http/                      Couche HTTP : routes, contrôleurs, intercepteurs
+├── infrastructure/            Services techniques : journalisation, base de données, sécurité
+├── migrer.ts                  Point d'entrée : applique les migrations
+└── creer-comptes-demo.ts      Point d'entrée : crée les comptes de démonstration
 migrations/                    Schéma SQL versionné (une migration = un changement)
 outils/postgres/               Initialisation du PostgreSQL local (docker-compose)
 tests/                         Tests automatisés, miroir de src/

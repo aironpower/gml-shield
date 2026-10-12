@@ -4,7 +4,7 @@ export function creerRoutesSante(): Router {
   const routeur = Router();
 
   routeur.get('/', (_requete, reponse) => {
-    reponse.json({ statut: 'ok' });
+    reponse.json({ status: 'ok' });
   });
 
   return routeur;

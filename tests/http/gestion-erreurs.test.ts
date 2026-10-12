@@ -19,7 +19,7 @@ describe('Gestion des erreurs inattendues', () => {
     const reponse = await request(application).get('/echec');
 
     expect(reponse.status).toBe(500);
-    expect(reponse.body).toEqual({ erreur: 'Erreur interne du serveur' });
+    expect(reponse.body).toEqual({ error: 'Erreur interne du serveur' });
     expect(JSON.stringify(reponse.body)).not.toContain('users');
   });
 
@@ -45,6 +45,6 @@ describe('Gestion des erreurs inattendues', () => {
     const reponse = await request(application).get('/echec');
 
     expect(reponse.status).toBe(422);
-    expect(reponse.body).toEqual({ erreur: 'Requête invalide' });
+    expect(reponse.body).toEqual({ error: 'Requête invalide' });
   });
 });
