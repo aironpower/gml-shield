@@ -1,0 +1,15 @@
+# Dépendances et compilation
+node_modules/
+dist/
+coverage/
+
+# Secrets : seul .env.example est versionné
+.env
+.env.*
+!.env.example
+
+# Divers
+*.log
+.DS_Store
+.vscode/
+.scannerwork/
