@@ -4,13 +4,17 @@ Messagerie opérationnelle sécurisée de **GreenMove Logistics** : les réparti
 
 ## Démarrage local
 
-Prérequis : Node.js 22 ou plus.
+Prérequis : Node.js 22 ou plus, Docker.
 
 ```bash
 npm ci
 cp .env.example .env
-npm run dev          # serveur sur http://localhost:3000/api/sante
+docker compose up -d   # PostgreSQL local (bases gml_shield et gml_shield_test)
+npm run migrer         # crée ou met à jour le schéma
+npm run dev            # serveur sur http://localhost:3000/api/sante
 ```
+
+Les tests (`npm test`) mettent automatiquement à jour le schéma de la base `gml_shield_test` ; chaque test s'exécute dans une transaction annulée.
 
 ## Commandes qualité
 
@@ -29,6 +33,9 @@ src/
 ├── serveur.ts                 Point d'entrée : ouvre le port réseau
 ├── configuration/             Variables d'environnement validées au démarrage
 ├── http/                      Couche HTTP : application, routes, intercepteurs
-└── infrastructure/            Services techniques (journalisation…)
+├── infrastructure/            Services techniques : journalisation, base de données
+└── migrer.ts                  Point d'entrée : applique les migrations
+migrations/                    Schéma SQL versionné (une migration = un changement)
+outils/postgres/               Initialisation du PostgreSQL local (docker-compose)
 tests/                         Tests automatisés, miroir de src/
 ```
