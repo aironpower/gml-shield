@@ -1,6 +1,4 @@
-export const ROLES_UTILISATEUR = ['ADMIN', 'DISPATCHER', 'DRIVER'] as const;
-
-export type RoleUtilisateur = (typeof ROLES_UTILISATEUR)[number];
+export type RoleUtilisateur = 'ADMIN' | 'DISPATCHER' | 'DRIVER';
 
 export interface UtilisateurAuthentifie {
   id: string;
