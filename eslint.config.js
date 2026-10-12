@@ -1,13 +1,14 @@
 // Chaque règle ci-dessous correspond à une règle numérotée du guide qualité de code (docs/).
 // Toute modification d'un seuil doit être faite dans les deux documents dans la même PR.
 import eslint from '@eslint/js';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
 const IDENTIFIANT_ASCII = '^[A-Za-z_$][A-Za-z0-9_$]*$';
 
 export default tseslint.config(
-  { ignores: ['dist/', 'coverage/', 'node_modules/', 'public/'] },
+  { ignores: ['dist/', 'coverage/', 'node_modules/'] },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
@@ -87,6 +88,13 @@ export default tseslint.config(
   {
     files: ['**/*.js'],
     ...tseslint.configs.disableTypeChecked,
+  },
+  {
+    // Client web (JavaScript exécuté par le navigateur) : mêmes règles de lisibilité et de
+    // nommage, sans les règles qui exigent des types TypeScript.
+    files: ['public/**/*.js'],
+    languageOptions: { globals: globals.browser },
+    rules: { '@typescript-eslint/explicit-module-boundary-types': 'off' },
   },
   prettier,
 );

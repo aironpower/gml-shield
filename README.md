@@ -2,6 +2,10 @@
 
 Messagerie opérationnelle sécurisée de **GreenMove Logistics** : les répartiteurs transmettent aux chauffeurs leurs missions (destination, code d'accès à l'entrepôt) de façon authentifiée, chiffrée et traçable, en remplacement des SMS, e-mails et boucles WhatsApp.
 
+**Application en ligne : https://gml-shield.onrender.com** (offre gratuite : le premier chargement après une période d'inactivité peut prendre une minute).
+
+Comptes de démonstration : `admin@gml-shield.test`, `repartiteur@gml-shield.test`, `chauffeur.martin@gml-shield.test`, `chauffeur.durand@gml-shield.test`. Leur mot de passe n'est pas publié dans ce dépôt ; il est communiqué séparément.
+
 ## Démarrage local
 
 Prérequis : Node.js 22 ou plus, Docker.
@@ -36,6 +40,21 @@ Les tests (`npm test`) mettent automatiquement à jour le schéma de la base `gm
 
 Toute requête `POST`, `PUT`, `PATCH` ou `DELETE` doit porter l'en-tête `Origin` du client autorisé (`ORIGINE_AUTORISEE`) et est inscrite au journal d'audit.
 
+## Déploiement
+
+| Élément                                      | Hébergement                                        | Sécurité                                                                                                                 |
+| -------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Serveur Node.js (API, WebSocket, client web) | Render, région Francfort, décrit par `render.yaml` | HTTPS / WSS de bout en bout, secrets générés par Render                                                                  |
+| PostgreSQL 17                                | Supabase, région Paris, via le pooler IPv4         | TLS avec vérification du certificat (`certificats/supabase-ca-2021.crt`), API de données Supabase désactivée, RLS activé |
+| Preuves de livraison                         | Compartiment privé Supabase Storage                | Aucune URL publique, accès par clé secrète côté serveur uniquement                                                       |
+
+Chaque fusion dans `main` redéploie automatiquement le service ; le démarrage applique les migrations en attente. Le schéma et les comptes de démonstration de la base de production sont initialisés depuis un poste d'administration :
+
+```bash
+DATABASE_URL=<url du pooler Supabase> CHEMIN_CERTIFICAT_CA_BASE=certificats/supabase-ca-2021.crt npm run migrer
+DATABASE_URL=<url du pooler Supabase> CHEMIN_CERTIFICAT_CA_BASE=certificats/supabase-ca-2021.crt npm run comptes:demo
+```
+
 ## Commandes qualité
 
 | Commande                  | Rôle                                                   |
@@ -61,7 +80,9 @@ src/
 ├── migrer.ts                  Point d'entrée : applique les migrations
 ├── creer-comptes-demo.ts      Point d'entrée : crée les comptes de démonstration
 └── preparer-stockage.ts       Point d'entrée : prépare le compartiment privé des preuves
+public/                        Client web (HTML, CSS, JavaScript sans framework)
 migrations/                    Schéma SQL versionné (une migration = un changement)
+certificats/                   Certificat racine public de l'autorité TLS de Supabase
 outils/postgres/               Initialisation du PostgreSQL local (docker-compose)
 tests/                         Tests automatisés, miroir de src/
 ```

@@ -10,6 +10,7 @@ import { enregistrerConnexion } from './hub-notifications.js';
 export const CHEMIN_TEMPS_REEL = '/ws';
 const TAILLE_MAXIMALE_MESSAGE_OCTETS = 1024;
 const CODE_FERMETURE_SESSION_EXPIREE = 4001;
+const INTERVALLE_BATTEMENT_MS = 30_000;
 
 /**
  * Greffe le serveur WebSocket sur le serveur HTTPS existant (même port, même certificat TLS :
@@ -27,6 +28,18 @@ export function brancherServeurTempsReel(serveurHttp: Server, origineAutorisee: 
 
   serveurHttp.on('upgrade', (requete: IncomingMessage, socket: Duplex, entete: Buffer) => {
     void accepterSiAutorise({ requete, socket, entete, origineAutorisee, serveurWebSocket });
+  });
+
+  // Pourquoi un battement régulier : les proxys de l'hébergeur ferment une connexion inactive ;
+  // un « ping » toutes les 30 s la maintient ouverte entre deux missions.
+  const battement = setInterval(() => {
+    serveurWebSocket.clients.forEach((connexion) => {
+      connexion.ping();
+    });
+  }, INTERVALLE_BATTEMENT_MS);
+  battement.unref();
+  serveurHttp.on('close', () => {
+    clearInterval(battement);
   });
 }
 

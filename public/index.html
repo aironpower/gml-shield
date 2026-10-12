@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GML-SHIELD</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/application.js"></script>
+  </head>
+  <body>
+    <header class="entete">
+      <span class="logo">GML-SHIELD</span>
+      <span id="utilisateur-connecte" class="utilisateur-connecte"></span>
+      <button id="bouton-deconnexion" class="bouton bouton-secondaire" type="button" hidden>
+        Se déconnecter
+      </button>
+    </header>
+
+    <main class="contenu">
+      <section id="vue-connexion" class="vue carte carte-etroite" hidden>
+        <h1>Connexion</h1>
+        <form id="formulaire-connexion" class="formulaire">
+          <label>
+            Adresse e-mail
+            <input name="email" type="email" autocomplete="username" required />
+          </label>
+          <label>
+            Mot de passe
+            <input name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <button class="bouton" type="submit">Se connecter</button>
+          <p id="erreur-connexion" class="message message-erreur" role="alert"></p>
+        </form>
+      </section>
+
+      <section id="vue-repartiteur" class="vue" hidden>
+        <div class="carte">
+          <h2>Nouvelle mission</h2>
+          <form id="formulaire-mission" class="formulaire formulaire-grille">
+            <label>
+              Titre
+              <input name="title" maxlength="200" required />
+            </label>
+            <label>
+              Destination
+              <input name="destination" maxlength="500" required />
+            </label>
+            <label>
+              Code d'accès à l'entrepôt
+              <input
+                name="secret_code"
+                type="password"
+                autocomplete="off"
+                minlength="4"
+                maxlength="64"
+                required
+              />
+            </label>
+            <label>
+              Chauffeur
+              <select id="choix-chauffeur" name="driver_id" required></select>
+            </label>
+            <button class="bouton" type="submit">Créer et assigner</button>
+            <p id="message-mission" class="message" role="status"></p>
+          </form>
+        </div>
+        <div class="carte">
+          <div class="titre-avec-action">
+            <h2>Mes missions</h2>
+            <button
+              id="actualiser-missions-repartiteur"
+              class="bouton bouton-secondaire"
+              type="button"
+            >
+              Actualiser
+            </button>
+          </div>
+          <table class="tableau">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Destination</th>
+                <th>Chauffeur</th>
+                <th>Statut</th>
+                <th>Créée le</th>
+                <th>Preuves de livraison</th>
+              </tr>
+            </thead>
+            <tbody id="corps-missions-repartiteur"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="vue-chauffeur" class="vue" hidden>
+        <div class="titre-avec-action">
+          <h2>Mes missions</h2>
+          <span id="etat-temps-reel" class="pastille"></span>
+        </div>
+        <div id="liste-missions-chauffeur" class="liste-cartes"></div>
+      </section>
+
+      <section id="vue-administration" class="vue carte" hidden>
+        <div class="titre-avec-action">
+          <h2>Journal d'audit</h2>
+          <button id="actualiser-journal" class="bouton bouton-secondaire" type="button">
+            Actualiser
+          </button>
+        </div>
+        <table class="tableau">
+          <thead>
+            <tr>
+              <th>Horodatage</th>
+              <th>Utilisateur</th>
+              <th>Action</th>
+              <th>Adresse IP</th>
+              <th>Statut HTTP</th>
+            </tr>
+          </thead>
+          <tbody id="corps-journal-audit"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <div id="zone-notifications" class="zone-notifications" role="status" aria-live="polite"></div>
+  </body>
+</html>

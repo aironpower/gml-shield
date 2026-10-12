@@ -1,0 +1,38 @@
+# Déploiement Render décrit dans le dépôt (« infrastructure as code ») : la configuration de
+# production est relue en revue comme le reste du code. Les secrets ne figurent jamais ici :
+# « sync: false » les fait saisir dans la console Render, « generateValue » les fait générer.
+services:
+  - type: web
+    name: gml-shield
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    # --include=dev : TypeScript est nécessaire à la compilation même si NODE_ENV=production.
+    buildCommand: npm ci --include=dev && npm run build
+    # Les migrations sont rejouées à chaque démarrage ; elles sont sans effet si le schéma est à jour.
+    startCommand: npm run migrer:production && npm start
+    healthCheckPath: /api/sante
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NIVEAU_JOURNAL
+        value: info
+      # Render place un reverse proxy devant le service : il fournit l'IP réelle du client.
+      - key: NOMBRE_PROXYS_DE_CONFIANCE
+        value: '1'
+      - key: DATABASE_URL
+        sync: false
+      - key: CHEMIN_CERTIFICAT_CA_BASE
+        value: certificats/supabase-ca-2021.crt
+      - key: SECRET_JWT
+        generateValue: true
+      - key: CLE_CHIFFREMENT_SECRETS
+        generateValue: true
+      - key: STOCKAGE_PREUVES
+        value: supabase
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_CLE_SECRETE
+        sync: false

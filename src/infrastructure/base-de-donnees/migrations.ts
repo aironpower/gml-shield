@@ -1,4 +1,5 @@
 import { runner } from 'node-pg-migrate';
+import type pg from 'pg';
 import { journalApplicatif } from '../journal-applicatif.js';
 
 const DOSSIER_MIGRATIONS = 'migrations';
@@ -13,9 +14,9 @@ const TABLE_SUIVI_MIGRATIONS = 'schema_migrations';
  * `checkOrder` refuse une migration insérée avant une migration déjà appliquée, afin que
  * toutes les bases (locale, test, production) suivent exactement la même histoire.
  */
-export async function appliquerMigrations(urlBaseDonnees: string): Promise<void> {
+export async function appliquerMigrations(connexion: string | pg.ClientConfig): Promise<void> {
   await runner({
-    databaseUrl: urlBaseDonnees,
+    databaseUrl: connexion,
     dir: DOSSIER_MIGRATIONS,
     migrationsTable: TABLE_SUIVI_MIGRATIONS,
     direction: 'up',
