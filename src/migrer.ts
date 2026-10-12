@@ -1,4 +1,4 @@
-import { environnement } from './configuration/environnement.js';
+import { configurationConnexionBaseDonnees } from './infrastructure/base-de-donnees/configuration-connexion.js';
 import { appliquerMigrations } from './infrastructure/base-de-donnees/migrations.js';
 
-await appliquerMigrations(environnement.DATABASE_URL);
+await appliquerMigrations(configurationConnexionBaseDonnees());

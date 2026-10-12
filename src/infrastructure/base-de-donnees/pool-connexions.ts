@@ -1,5 +1,5 @@
 import pg from 'pg';
-import { environnement } from '../../configuration/environnement.js';
+import { configurationConnexionBaseDonnees } from './configuration-connexion.js';
 
 const NOMBRE_MAXIMAL_CONNEXIONS = 10;
 
@@ -15,6 +15,6 @@ const NOMBRE_MAXIMAL_CONNEXIONS = 10;
  * du texte SQL, ce qui rend l'injection impossible.
  */
 export const poolConnexions = new pg.Pool({
-  connectionString: environnement.DATABASE_URL,
+  ...configurationConnexionBaseDonnees(),
   max: NOMBRE_MAXIMAL_CONNEXIONS,
 });

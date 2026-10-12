@@ -15,6 +15,8 @@ const schemaEnvironnement = z
     NIVEAU_JOURNAL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'silent']).default('info'),
     NOMBRE_PROXYS_DE_CONFIANCE: z.coerce.number().int().min(0).max(5).default(0),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    // Certificat de l'autorité qui a signé celui du serveur PostgreSQL (vérification TLS complète).
+    CHEMIN_CERTIFICAT_CA_BASE: z.string().min(1).optional(),
     // 32 caractères minimum : en dessous, la clé HMAC du jeton devient attaquable par force brute.
     SECRET_JWT: z.string().min(32),
     DUREE_SESSION_MINUTES: z.coerce.number().int().min(1).max(60).default(15),
@@ -40,4 +42,11 @@ const schemaEnvironnement = z
 
 export type Environnement = z.infer<typeof schemaEnvironnement>;
 
-export const environnement: Environnement = schemaEnvironnement.parse(process.env);
+/**
+ * Render fournit l'adresse publique du service dans RENDER_EXTERNAL_URL : elle sert d'origine
+ * autorisée par défaut, ce qui évite une erreur de recopie entre l'URL et la configuration.
+ */
+export const environnement: Environnement = schemaEnvironnement.parse({
+  ...process.env,
+  ORIGINE_AUTORISEE: process.env.ORIGINE_AUTORISEE ?? process.env.RENDER_EXTERNAL_URL,
+});
