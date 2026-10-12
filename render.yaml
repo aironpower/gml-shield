@@ -10,7 +10,7 @@ services:
     branch: main
     autoDeploy: true
     # --include=dev : TypeScript est nécessaire à la compilation même si NODE_ENV=production.
-    buildCommand: npm ci --include=dev && npm run build
+    buildCommand: npm ci --include=dev --ignore-scripts && npm run build
     # Les migrations sont rejouées à chaque démarrage ; elles sont sans effet si le schéma est à jour.
     startCommand: npm run migrer:production && npm start
     healthCheckPath: /api/sante

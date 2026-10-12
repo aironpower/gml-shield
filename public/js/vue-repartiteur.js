@@ -34,14 +34,14 @@ export function ouvrirVueRepartiteur({ gererErreur }) {
     'submit',
     (evenement) => {
       evenement.preventDefault();
-      creerMission(formulaire, { gererErreur, recharger: charger });
+      void creerMission(formulaire, { gererErreur, recharger: charger });
     },
     { signal: arretEcouteurs.signal },
   );
   document
     .getElementById('actualiser-missions-repartiteur')
     .addEventListener('click', charger, { signal: arretEcouteurs.signal });
-  charger();
+  void charger();
   return () => {
     arretEcouteurs.abort();
   };

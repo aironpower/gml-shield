@@ -1,5 +1,7 @@
 # GML-SHIELD
 
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=aironpower_gml-shield&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=aironpower_gml-shield)
+
 Messagerie opérationnelle sécurisée de **GreenMove Logistics** : les répartiteurs transmettent aux chauffeurs leurs missions (destination, code d'accès à l'entrepôt) de façon authentifiée, chiffrée et traçable, en remplacement des SMS, e-mails et boucles WhatsApp.
 
 **Application en ligne : https://gml-shield.onrender.com** (offre gratuite : le premier chargement après une période d'inactivité peut prendre une minute).

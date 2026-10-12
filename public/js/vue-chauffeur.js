@@ -39,12 +39,12 @@ export function ouvrirVueChauffeur({ gererErreur, surSessionExpiree }) {
   const arreterTempsReel = ecouterNouvellesMissions({
     surNouvelleMission: (mission) => {
       afficherNotification(`Nouvelle mission : ${mission.title} — ${mission.destination}`);
-      charger();
+      void charger();
     },
     surChangementEtat: afficherEtatTempsReel,
     surSessionExpiree,
   });
-  charger();
+  void charger();
   return arreterTempsReel;
 }
 
