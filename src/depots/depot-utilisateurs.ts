@@ -58,3 +58,27 @@ function versCompteUtilisateur(ligne: LigneUtilisateur | undefined): CompteUtili
     estActif: ligne.is_active,
   };
 }
+
+export interface ChauffeurDisponible {
+  id: string;
+  email: string;
+}
+
+export async function listerChauffeursActifs(): Promise<ChauffeurDisponible[]> {
+  const resultat = await poolConnexions.query<ChauffeurDisponible>(
+    "SELECT id, email FROM users WHERE role = 'DRIVER' AND is_active ORDER BY email",
+  );
+  return resultat.rows;
+}
+
+/**
+ * Pourquoi vérifier le rôle : la clé étrangère garantit seulement que l'utilisateur existe ;
+ * sans ce contrôle, une mission pourrait être assignée à un répartiteur ou à un compte désactivé.
+ */
+export async function estChauffeurActif(idUtilisateur: string): Promise<boolean> {
+  const resultat = await poolConnexions.query(
+    "SELECT 1 FROM users WHERE id = $1 AND role = 'DRIVER' AND is_active",
+    [idUtilisateur],
+  );
+  return resultat.rowCount === 1;
+}
