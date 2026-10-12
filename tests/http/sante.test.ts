@@ -9,7 +9,7 @@ describe('Socle HTTP', () => {
     const reponse = await request(application).get('/api/sante');
 
     expect(reponse.status).toBe(200);
-    expect(reponse.body).toEqual({ statut: 'ok' });
+    expect(reponse.body).toEqual({ status: 'ok' });
   });
 
   it('ajoute les en-têtes de sécurité et masque la technologie du serveur', async () => {
@@ -24,7 +24,7 @@ describe('Socle HTTP', () => {
     const reponse = await request(application).get('/api/inexistant');
 
     expect(reponse.status).toBe(404);
-    expect(reponse.body).toEqual({ erreur: 'Ressource introuvable' });
+    expect(reponse.body).toEqual({ error: 'Ressource introuvable' });
   });
 
   it('refuse un corps JSON dépassant la taille autorisée', async () => {
@@ -42,7 +42,7 @@ describe('Socle HTTP', () => {
       .send('{"json": invalide');
 
     expect(reponse.status).toBe(400);
-    expect(reponse.body).toEqual({ erreur: 'Requête mal formée' });
+    expect(reponse.body).toEqual({ error: 'Requête mal formée' });
   });
 
   it('n’accorde aucune confiance aux en-têtes X-Forwarded-For par défaut', () => {
@@ -50,7 +50,10 @@ describe('Socle HTTP', () => {
   });
 
   it('ne fait confiance qu’au nombre de proxys configuré, jamais à toute la chaîne', () => {
-    const applicationDerriereProxy = creerApplication({ nombreProxysDeConfiance: 1 });
+    const applicationDerriereProxy = creerApplication({
+      nombreProxysDeConfiance: 1,
+      origineAutorisee: 'http://localhost:3000',
+    });
 
     expect(applicationDerriereProxy.get('trust proxy')).toBe(1);
   });
