@@ -39,18 +39,23 @@
           <form id="formulaire-mission" class="formulaire formulaire-grille">
             <label>
               Titre
-              <input name="title" maxlength="200" required />
+              <input name="title" maxlength="200" autocomplete="off" required />
             </label>
             <label>
               Destination
-              <input name="destination" maxlength="500" required />
+              <input name="destination" maxlength="500" autocomplete="off" required />
             </label>
             <label>
               Code d'accès à l'entrepôt
+              <!--
+                « new-password » et non « off » : les navigateurs ignorent « off » sur un champ
+                mot de passe et y injecteraient les identifiants de connexion enregistrés (l'e-mail
+                du répartiteur atterrissait dans « Destination »).
+              -->
               <input
                 name="secret_code"
                 type="password"
-                autocomplete="off"
+                autocomplete="new-password"
                 minlength="4"
                 maxlength="64"
                 required
