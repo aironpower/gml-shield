@@ -1,4 +1,5 @@
-import type { ErrorRequestHandler, RequestHandler, Response } from 'express';
+import type { ErrorRequestHandler, RequestHandler } from 'express';
+import { MulterError } from 'multer';
 import { ZodError } from 'zod';
 import { ErreurApplicative } from '../../domaine/erreurs.js';
 import { journalApplicatif } from '../../infrastructure/journal-applicatif.js';
@@ -9,6 +10,11 @@ const MESSAGES_ERREURS_CLIENT: Readonly<Record<number, string>> = {
   415: 'Type de contenu non pris en charge',
 };
 
+interface ReponseErreur {
+  statut: number;
+  corps: { error: string; details?: { field: string; message: string }[] };
+}
+
 export const repondreRouteIntrouvable: RequestHandler = (_requete, reponse) => {
   reponse.status(404).json({ error: 'Ressource introuvable' });
 };
@@ -16,12 +22,11 @@ export const repondreRouteIntrouvable: RequestHandler = (_requete, reponse) => {
 /**
  * Dernier filet de sécurité de la chaîne Express : traduit chaque erreur en réponse HTTP.
  *
- * - Erreur métier prévue (ErreurApplicative) : son statut et son message, conçus pour l'utilisateur.
- * - Données invalides (ZodError) : 400 avec le champ fautif, pour que le client puisse corriger.
- * - Erreur client signalée par Express (corps trop volumineux, JSON mal formé) : son statut 4xx.
- * - Toute autre erreur : 500 avec un message générique. Renvoyer la pile d'appels ou le message
- *   technique révélerait la structure interne (tables, chemins, versions) à un attaquant
- *   (OWASP A05 - Security Misconfiguration). Le détail part uniquement dans le journal serveur.
+ * Une erreur prévue (métier, validation, téléversement, erreur client signalée par Express)
+ * reçoit son statut et un message destiné à l'utilisateur. Toute autre erreur reçoit 500 et
+ * un message générique : renvoyer la pile d'appels ou le message technique révélerait la
+ * structure interne (tables, chemins, versions) à un attaquant (OWASP A05). Le détail part
+ * uniquement dans le journal serveur.
  */
 export const repondreErreurInattendue: ErrorRequestHandler = (
   erreur,
@@ -29,18 +34,9 @@ export const repondreErreurInattendue: ErrorRequestHandler = (
   reponse,
   _suite,
 ) => {
-  if (erreur instanceof ErreurApplicative) {
-    reponse.status(erreur.statutHttp).json({ error: erreur.message });
-    return;
-  }
-  if (erreur instanceof ZodError) {
-    repondreDonneesInvalides(reponse, erreur);
-    return;
-  }
-  const statutErreurClient = extraireStatutErreurClient(erreur);
-  if (statutErreurClient !== undefined) {
-    const message = MESSAGES_ERREURS_CLIENT[statutErreurClient] ?? 'Requête invalide';
-    reponse.status(statutErreurClient).json({ error: message });
+  const reponseErreur = traduireErreurPrevue(erreur);
+  if (reponseErreur !== undefined) {
+    reponse.status(reponseErreur.statut).json(reponseErreur.corps);
     return;
   }
 
@@ -48,12 +44,37 @@ export const repondreErreurInattendue: ErrorRequestHandler = (
   reponse.status(500).json({ error: 'Erreur interne du serveur' });
 };
 
-function repondreDonneesInvalides(reponse: Response, erreur: ZodError): void {
+function traduireErreurPrevue(erreur: unknown): ReponseErreur | undefined {
+  if (erreur instanceof ErreurApplicative) {
+    return { statut: erreur.statutHttp, corps: { error: erreur.message } };
+  }
+  if (erreur instanceof ZodError) {
+    return traduireDonneesInvalides(erreur);
+  }
+  if (erreur instanceof MulterError) {
+    return traduireErreurTeleversement(erreur);
+  }
+  const statutErreurClient = extraireStatutErreurClient(erreur);
+  if (statutErreurClient === undefined) {
+    return undefined;
+  }
+  const message = MESSAGES_ERREURS_CLIENT[statutErreurClient] ?? 'Requête invalide';
+  return { statut: statutErreurClient, corps: { error: message } };
+}
+
+function traduireDonneesInvalides(erreur: ZodError): ReponseErreur {
   const details = erreur.issues.map((probleme) => ({
     field: probleme.path.map(String).join('.'),
     message: probleme.message,
   }));
-  reponse.status(400).json({ error: 'Données invalides', details });
+  return { statut: 400, corps: { error: 'Données invalides', details } };
+}
+
+function traduireErreurTeleversement(erreur: MulterError): ReponseErreur {
+  if (erreur.code === 'LIMIT_FILE_SIZE') {
+    return { statut: 413, corps: { error: 'Fichier trop volumineux (10 Mo maximum)' } };
+  }
+  return { statut: 400, corps: { error: 'Envoi de fichier invalide : un seul champ « file »' } };
 }
 
 function extraireStatutErreurClient(erreur: unknown): number | undefined {

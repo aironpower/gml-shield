@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import { z } from 'zod';
 import { environnement } from '../configuration/environnement.js';
 import { creerRoutesAuthentification } from './routes/routes-authentification.js';
+import { creerRoutesChauffeurs } from './routes/routes-chauffeurs.js';
+import { creerRoutesMissions } from './routes/routes-missions.js';
 import { creerRoutesSante } from './routes/routes-sante.js';
 import {
   repondreErreurInattendue,
@@ -65,6 +67,8 @@ export function creerApplication(
 
   application.use('/api/sante', creerRoutesSante());
   application.use('/api/auth', creerRoutesAuthentification());
+  application.use('/api/missions', creerRoutesMissions());
+  application.use('/api/drivers', creerRoutesChauffeurs());
 
   application.use(repondreRouteIntrouvable);
   application.use(repondreErreurInattendue);

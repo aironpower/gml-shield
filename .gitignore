@@ -8,6 +8,9 @@ coverage/
 .env.*
 !.env.example
 
+# Fichiers déposés en local (preuves de livraison) : jamais versionnés
+stockage-prive/
+
 # Divers
 *.log
 .DS_Store
