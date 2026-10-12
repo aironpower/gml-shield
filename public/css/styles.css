@@ -1,0 +1,263 @@
+:root {
+  --couleur-fond: #f4f6f8;
+  --couleur-surface: #ffffff;
+  --couleur-texte: #1d2733;
+  --couleur-texte-secondaire: #5b6775;
+  --couleur-bordure: #d9dee4;
+  --couleur-principale: #1f6f4a;
+  --couleur-principale-sombre: #17573a;
+  --couleur-succes: #1f7a4d;
+  --couleur-attention: #9a6700;
+  --couleur-erreur: #b42318;
+  --rayon: 8px;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: var(--couleur-texte);
+  background: var(--couleur-fond);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--couleur-principale);
+  color: #ffffff;
+}
+
+.logo {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.utilisateur-connecte {
+  margin-left: auto;
+  font-size: 0.9rem;
+}
+
+.contenu {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.vue {
+  display: grid;
+  gap: 24px;
+}
+
+.carte {
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure);
+  border-radius: var(--rayon);
+  padding: 20px;
+}
+
+.carte-etroite {
+  max-width: 420px;
+  margin: 48px auto;
+}
+
+.liste-cartes {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.carte-mission h3 {
+  margin: 0;
+}
+
+.titre-avec-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.formulaire {
+  display: grid;
+  gap: 12px;
+}
+
+.formulaire-grille {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: end;
+}
+
+.formulaire-ligne {
+  margin: 12px 0;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--couleur-texte-secondaire);
+}
+
+input,
+select {
+  padding: 8px 10px;
+  border: 1px solid var(--couleur-bordure);
+  border-radius: var(--rayon);
+  font: inherit;
+  color: var(--couleur-texte);
+}
+
+.bouton {
+  padding: 9px 16px;
+  border: 1px solid var(--couleur-principale);
+  border-radius: var(--rayon);
+  background: var(--couleur-principale);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bouton:hover {
+  background: var(--couleur-principale-sombre);
+}
+
+.bouton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bouton-secondaire {
+  background: transparent;
+  color: var(--couleur-principale);
+}
+
+.entete .bouton-secondaire {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.bouton-secondaire:hover {
+  background: rgba(31, 111, 74, 0.08);
+}
+
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.tableau th,
+.tableau td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--couleur-bordure);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tableau th {
+  color: var(--couleur-texte-secondaire);
+  font-weight: 600;
+}
+
+.ligne-echec td {
+  color: var(--couleur-erreur);
+}
+
+.pastille {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: #eef1f4;
+}
+
+.pastille-pending {
+  background: #fff4d6;
+  color: var(--couleur-attention);
+}
+
+.pastille-in_progress {
+  background: #e1ecff;
+  color: #1d4ed8;
+}
+
+.pastille-completed {
+  background: #ddf3e6;
+  color: var(--couleur-succes);
+}
+
+.zone-code {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.code-secret {
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+}
+
+.detail {
+  color: var(--couleur-texte-secondaire);
+  font-size: 0.85rem;
+}
+
+.message {
+  margin: 0;
+  min-height: 1.2em;
+}
+
+.message-succes {
+  color: var(--couleur-succes);
+}
+
+.message-erreur {
+  color: var(--couleur-erreur);
+}
+
+.lien-telechargement {
+  display: block;
+  color: var(--couleur-principale);
+}
+
+.zone-notifications {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: grid;
+  gap: 8px;
+  z-index: 10;
+}
+
+.notification {
+  min-width: 260px;
+  max-width: 380px;
+  padding: 12px 16px;
+  border-radius: var(--rayon);
+  color: #ffffff;
+  background: #1d2733;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.notification-succes {
+  background: var(--couleur-succes);
+}
+
+.notification-erreur {
+  background: var(--couleur-erreur);
+}

@@ -13,3 +13,23 @@ export async function enregistrerTraceAudit(trace: TraceAudit): Promise<void> {
     [trace.idUtilisateur ?? null, trace.action, trace.adresseIp ?? null, trace.statutHttp],
   );
 }
+
+export interface TraceAuditLue {
+  id: string;
+  email: string | null;
+  action: string;
+  ip_address: string | null;
+  http_status: number | null;
+  timestamp: Date;
+}
+
+/** Dernières traces, la plus récente en premier, avec l'e-mail de l'auteur s'il est connu. */
+export async function listerDernieresTraces(nombreMaximal: number): Promise<TraceAuditLue[]> {
+  const resultat = await poolConnexions.query<TraceAuditLue>(
+    `SELECT a.id, u.email, a.action, a.ip_address, a.http_status, a.timestamp
+     FROM audit_logs a LEFT JOIN users u ON u.id = a.user_id
+     ORDER BY a.id DESC LIMIT $1`,
+    [nombreMaximal],
+  );
+  return resultat.rows;
+}

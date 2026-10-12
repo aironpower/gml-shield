@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
@@ -5,6 +6,7 @@ import { z } from 'zod';
 import { environnement } from '../configuration/environnement.js';
 import { creerRoutesAuthentification } from './routes/routes-authentification.js';
 import { creerRoutesChauffeurs } from './routes/routes-chauffeurs.js';
+import { creerRoutesJournalAudit } from './routes/routes-journal-audit.js';
 import { creerRoutesMissions } from './routes/routes-missions.js';
 import { creerRoutesSante } from './routes/routes-sante.js';
 import {
@@ -15,6 +17,7 @@ import { journaliserAudit } from './intercepteurs/journaliser-audit.js';
 import { verifierOrigine } from './intercepteurs/verifier-origine.js';
 
 const TAILLE_MAXIMALE_CORPS_JSON = '100kb';
+const DOSSIER_CLIENT_WEB = fileURLToPath(new URL('../../public', import.meta.url));
 
 z.config(z.locales.fr());
 
@@ -50,7 +53,7 @@ function lireOptionsDepuisEnvironnement(): OptionsApplication {
  * 2. journal d'audit avant tout filtrage, pour tracer aussi les requêtes refusées ;
  * 3. lecture du corps et des cookies ;
  * 4. contrôle d'origine anti-CSRF avant d'atteindre la moindre route ;
- * 5. routes, puis gestion des erreurs en dernier.
+ * 5. routes de l'API, puis client web statique, puis gestion des erreurs en dernier.
  */
 export function creerApplication(
   options: OptionsApplication = lireOptionsDepuisEnvironnement(),
@@ -59,7 +62,7 @@ export function creerApplication(
 
   application.set('trust proxy', options.nombreProxysDeConfiance);
   application.disable('x-powered-by');
-  application.use(helmet());
+  application.use(helmet({ contentSecurityPolicy: { directives: directivesCsp(options) } }));
   application.use(journaliserAudit);
   application.use(express.json({ limit: TAILLE_MAXIMALE_CORPS_JSON }));
   application.use(cookieParser());
@@ -69,9 +72,22 @@ export function creerApplication(
   application.use('/api/auth', creerRoutesAuthentification());
   application.use('/api/missions', creerRoutesMissions());
   application.use('/api/drivers', creerRoutesChauffeurs());
+  application.use('/api/audit-logs', creerRoutesJournalAudit());
+  application.use(express.static(DOSSIER_CLIENT_WEB));
 
   application.use(repondreRouteIntrouvable);
   application.use(repondreErreurInattendue);
 
   return application;
+}
+
+/**
+ * Politique de sécurité du contenu (CSP) : en plus des valeurs strictes de helmet (scripts
+ * uniquement servis par GML-SHIELD, aucun script en ligne), seule la connexion WebSocket vers
+ * notre propre serveur est autorisée. Un script injecté ne pourrait donc ni s'exécuter depuis
+ * un autre domaine, ni exfiltrer des données vers un serveur tiers.
+ */
+function directivesCsp(options: OptionsApplication): Record<string, string[]> {
+  const origineWebSocket = options.origineAutorisee.replace(/^http/, 'ws');
+  return { connectSrc: ["'self'", origineWebSocket] };
 }
