@@ -19,13 +19,13 @@ services:
         value: production
       - key: NIVEAU_JOURNAL
         value: info
-      # Render place deux proxys devant le service (passerelle publique puis répartiteur interne
-      # en 10.x.x.x). Avec 1, le journal d'audit enregistrait l'IP interne de Render et la limite
-      # de tentatives de connexion était partagée par tous les utilisateurs. Valeur constatée en
-      # production : elle ne doit jamais dépasser le nombre réel de proxys, sinon un client
-      # pourrait usurper son adresse via X-Forwarded-For.
+      # Chaîne constatée en production : client -> Cloudflare -> passerelle Render -> répartiteur
+      # interne (10.x.x.x) -> service. Vérifié dans le journal d'audit : avec 1, l'IP interne de
+      # Render était enregistrée ; avec 2, celle de Cloudflare ; avec 3, celle du client.
+      # La valeur ne doit jamais dépasser le nombre réel de proxys, sinon un client pourrait
+      # usurper son adresse via X-Forwarded-For.
       - key: NOMBRE_PROXYS_DE_CONFIANCE
-        value: '2'
+        value: '3'
       - key: DATABASE_URL
         sync: false
       - key: CHEMIN_CERTIFICAT_CA_BASE
