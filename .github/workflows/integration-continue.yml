@@ -14,6 +14,20 @@ jobs:
   verifier:
     name: Format, lint, typage, tests, build
     runs-on: ubuntu-latest
+    # Même configuration que le docker-compose local : base de test jetable, sans mot de passe.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: gml_shield
+          POSTGRES_DB: gml_shield_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U gml_shield"
+          --health-interval 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
