@@ -20,7 +20,7 @@ export function ouvrirVueAdministration({ gererErreur }) {
   document
     .getElementById('actualiser-journal')
     .addEventListener('click', charger, { signal: arretEcouteurs.signal });
-  charger();
+  void charger();
   return () => {
     arretEcouteurs.abort();
   };

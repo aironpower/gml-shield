@@ -85,4 +85,4 @@ async function demarrer() {
   }
 }
 
-demarrer();
+void demarrer();

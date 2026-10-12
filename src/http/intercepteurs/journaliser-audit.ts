@@ -40,6 +40,8 @@ async function tracerSansBloquer(requete: Request, statutHttp: number): Promise<
 
 /** Méthode et chemin, sans la chaîne de requête qui pourrait contenir des données sensibles. */
 function decrireAction(requete: Request): string {
-  const cheminSansParametres = requete.originalUrl.replace(/\?.*$/, '');
+  const debutParametres = requete.originalUrl.indexOf('?');
+  const cheminSansParametres =
+    debutParametres === -1 ? requete.originalUrl : requete.originalUrl.slice(0, debutParametres);
   return `${requete.method} ${cheminSansParametres}`.slice(0, LONGUEUR_MAXIMALE_ACTION);
 }
