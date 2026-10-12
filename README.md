@@ -6,6 +6,10 @@ Messagerie opérationnelle sécurisée de **GreenMove Logistics** : les réparti
 
 Comptes de démonstration : `admin@gml-shield.test`, `repartiteur@gml-shield.test`, `chauffeur.martin@gml-shield.test`, `chauffeur.durand@gml-shield.test`. Leur mot de passe n'est pas publié dans ce dépôt ; il est communiqué séparément.
 
+## Recette
+
+Le [tableau de recette](docs/recette.md) relie chaque exigence de l'énoncé au code qui la met en œuvre, au test qui la prouve et à la vérification possible dans l'application déployée.
+
 ## Démarrage local
 
 Prérequis : Node.js 22 ou plus, Docker.
@@ -81,6 +85,7 @@ src/
 ├── creer-comptes-demo.ts      Point d'entrée : crée les comptes de démonstration
 └── preparer-stockage.ts       Point d'entrée : prépare le compartiment privé des preuves
 public/                        Client web (HTML, CSS, JavaScript sans framework)
+docs/                          Documentation (tableau de recette)
 migrations/                    Schéma SQL versionné (une migration = un changement)
 certificats/                   Certificat racine public de l'autorité TLS de Supabase
 outils/postgres/               Initialisation du PostgreSQL local (docker-compose)
