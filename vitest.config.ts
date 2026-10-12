@@ -10,7 +10,12 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/serveur.ts', 'src/migrer.ts', 'src/creer-comptes-demo.ts'],
+      exclude: [
+        'src/serveur.ts',
+        'src/migrer.ts',
+        'src/creer-comptes-demo.ts',
+        'src/preparer-stockage.ts',
+      ],
       reporter: ['text', 'lcov'],
       thresholds: { lines: 80, statements: 80, functions: 80, branches: 75 },
     },
